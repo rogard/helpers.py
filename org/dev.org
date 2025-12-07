@@ -227,6 +227,11 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
 #+end_src
 
 #+begin_src python
+  # Original code (Bosch) as recorded at:
+  # https://github.com/rogard/helpers.py, commit 9d1a659
+#+end_src
+
+#+begin_src python
   #  Copyright (c) 2011, Philipp Bosch
   #
   #  Permission is hereby granted, free of charge, to any person obtaining a
@@ -275,15 +280,29 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
 
       try:
           r = requests.get(url)
-      except:
-          abort(500)
+          r.raise_for_status()
           
-      if not r.ok:
-          abort(r.status_code)
+          # previous attempt:
+          # try:
+          #     r = requests.get(url)
+          # except:
+          #     abort(500)
+          # if not r.ok:
+          #     abort(r.status_code)
+          
           ics = r.content
           cal = Calendar.from_ical(ics)
-          data = {}
-          data[cal.name] = dict(cal.items())
+      except requests.HTTPError as e:
+          # Source URL returned an error
+          abort(e.response.status_code if 400 <= e.response.status_code < 600 else 500)
+      except requests.RequestException:
+          abort(502)  # Bad Gateway - couldn't reach source
+      except Exception:
+          abort(500)  # Internal error parsing ICS
+
+      # build data
+      data = {}
+      data[cal.name] = dict(cal.items())
 
       for component in cal.subcomponents:
           if not component.name in data[cal.name]:
@@ -296,7 +315,7 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
               else:
                   val = item[1].to_ical().decode('utf-8').replace('\\,', ',')
                   comp_obj[item[0]] = val
-                  
+
           data[cal.name][component.name].append(comp_obj)
 
       resp = jsonify(data)
@@ -319,7 +338,7 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
 
 ** init
 :PROPERTIES:
-:header-args: :tangle "../py/__init__.py.py"
+:header-args: :tangle "../py/__init__.py"
 :END:
 
 #+header: :noweb yes
@@ -328,6 +347,19 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
 #+end_src
 
 * shell
+** constant
+
+#+name: shell-url-ics
+#+begin_src shell
+  # This is a dummy calendar
+  url_ics='https://calendar.google.com/calendar/ical/abe44317faa2cfe48c0ca99b5ede79bca5e401facae66c109e2cc870e0ad8338%40group.calendar.google.com/public/basic.ics'
+#+end_src
+
+#+name: shell-cal-json
+#+begin_src shell
+  cal_json='json/calendar.json'
+#+end_src
+
 ** ical2json
 *** setup
 
@@ -391,27 +423,47 @@ This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/bl
   cd "$(dirname "$0")/.."
 #+end_src
 
+#+header: :noweb yes
 #+begin_src shell
-  # This is a dummy calendar
-  url_ics='https://calendar.google.com/calendar/ical/abe44317faa2cfe48c0ca99b5ede79bca5e401facae66c109e2cc870e0ad8338%40group.calendar.google.com/public/basic.ics'
+  <<shell-url-ics>>
+#+end_src
+
+#+header: :noweb yes
+#+begin_src shell
+  <<shell-cal-json>>
 #+end_src
 
 #+begin_src shell
-  # PORT `flask` listens to:
-  export PORT=5000
-  url_local="http://0.0.0.0:$PORT"
+  #!/bin/bash
+  set -e
+  cd "$(dirname "$0")/.."
 #+end_src
 
 #+begin_src shell
-  url_proxy="${url_local%/}/${url_ics}"
+  port=5000
+  url_local="http://127.0.0.1:${port}"
+  url_proxy="${url_local}/${url_ics}"
 #+end_src
 
 #+begin_src shell
-  # This should download an *.ics file
-  pipenv run python py/ical2json.py --port $PORT &
-  sleep 1
-  xdg-open "$url_proxy"
-  wait
+  # Start Flask
+  pipenv run python py/ical2json.py &
+  flask_pid=$!
+  trap "kill $flask_pid 2>/dev/null || true" EXIT
+#+end_src
+
+#+begin_src shell
+  # Wait for server
+  for i in {1..30}; do
+      curl -s -o /dev/null "${url_local}/" 2>/dev/null && break
+      sleep 0.5
+  done
+#+end_src
+
+#+begin_src shell
+  # Fetch JSON and save
+  curl -s "${url_proxy}" > "$cal_json"
+  echo "Saved to $cal_json"
 #+end_src
 
 

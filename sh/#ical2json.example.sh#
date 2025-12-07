@@ -1,0 +1,31 @@
+v# -----------------------------------------------------------------
+# Copyright (C) 2025 Erwann Rogard
+# Source repository: https://github.com/rogard/helpers.py
+#
+# Python code:
+# Released under the GNU General Public License v3.0 or later
+# See https://www.gnu.org/licenses/gpl-3.0.html
+# -----------------------------------------------------------------
+
+set -e
+
+cd "$(dirname "$0")/..
+
+# This is a dummy calendar url_ics='https://calendar.google.com/calendar/ical/abe44317faa2cfe48c0ca99b5ede79bca5e401facae66c109e2cc870e0ad8338%40group.calendar.google.com/public/basic.ics'
+
+# PORT `flask` listens to:
+url_local='http://0.0.0.0:5000'
+
+url_proxy="${url_local%/}/${url_ics}"
+
+if [[ -z "$PIPENV_ACTIVE" ]]; then
+    pipenv shell
+fi
+
+# This should download an *.ics file
+python py/ical2json.py
+
+if (( $? == 0 )) ;
+then
+  pipenv run python py/ical2json.py && xdg-open "${url_proxy}"
+fi

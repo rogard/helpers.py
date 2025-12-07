@@ -1,0 +1,32 @@
+{
+  "VCALENDAR": {
+    "CALSCALE": "GREGORIAN",
+    "METHOD": "PUBLISH",
+    "PRODID": "-//Google Inc//Google Calendar 70.9054//EN",
+    "VERSION": "2.0",
+    "VEVENT": [
+      {
+        "CLASS": "PUBLIC",
+        "DESCRIPTION": "Website: https://www.meetup.com/french-classics-gv/events/312229789\\n\\nJoin with Google Meet: https://meet.google.com/dmx-diza-hmw\\n\\nLearn more about Meet at: https://support.google.com/a/users/answer/9282720",
+        "LOCATION": "Online",
+        "SEQUENCE": "0",
+        "STATUS": "CONFIRMED",
+        "SUMMARY": "French Classics Reading Group hosting language practice event online",
+        "TRANSP": "OPAQUE",
+        "UID": "5r8e3s3llrv5pnhh6jnofmgu71@google.com",
+        "X-GOOGLE-CONFERENCE": "https://meet.google.com/dmx-diza-hmw"
+      },
+      {
+        "LOCATION": "Curia On The Drag, 2029 NW 6th St, Gainesville, FL 32609, USA",
+        "SEQUENCE": "0",
+        "STATUS": "CONFIRMED",
+        "SUMMARY": "Japanese meetup hosted by Sushi & Kimono",
+        "TRANSP": "OPAQUE",
+        "UID": "6avermci2f1v5k43k7286han9g@google.com"
+      }
+    ],
+    "X-WR-CALDESC": "This calendar is a dummy one for development purposes.",
+    "X-WR-CALNAME": "dummy-calendar",
+    "X-WR-TIMEZONE": "America/New_York"
+  }
+}
