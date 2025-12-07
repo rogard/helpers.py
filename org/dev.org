@@ -1,18 +1,29 @@
+# helpers.py
+
+#+begin_src org
+  This is a meta file from which are generated source files.
+#+end_src
 
 * py
+** shebang
+
+#+name: py-shebang
+#+begin_src python
+  #!/usr/bin/env python
+#+end_src
+
 ** license
 
 #+name: py-license
 #+begin_src python
-# -----------------------------------------------------------------
-# Copyright (C) 2025 Erwann Rogard
-# Source repository: https://github.com/rogard/helpers.py
-#
-# Python code:
-# Released under the GNU General Public License v3.0 or later
-# See https://www.gnu.org/licenses/gpl-3.0.html
-# -----------------------------------------------------------------
-
+  # -----------------------------------------------------------------
+  # Copyright (C) 2025 Erwann Rogard
+  # Source repository: https://github.com/rogard/helpers.py
+  #
+  # Python code:
+  # Released under the GNU General Public License v3.0 or later
+  # See https://www.gnu.org/licenses/gpl-3.0.html
+  # -----------------------------------------------------------------
 #+end_src
 
 ** censor
@@ -22,43 +33,12 @@
 
 #+header: :noweb yes
 #+begin_src python
+  <<py-shebang>>
+#+end_src
+
+#+header: :noweb yes
+#+begin_src python
   <<py-license>>
-#+end_src
-
-#+begin_src python
-import os
-import re
-import sys
-#+end_src
-
-#+begin_src python
-UNSAFE_INFIX = ".unsafe"
-#+end_src
-
-#+begin_src python
-DEFAULT_COMMENT_SYMBOLS = {
-    "py": "#",
-    "python": "#",
-    "js": "//",
-    "javascript": "//",
-    "ts": "//",
-    "cpp": "//",
-    "c": "//",
-    "h": "//",
-    "java": "//",
-    "rb": "#",
-    "sh": "#",
-    "bash": "#",
-    "tex": "%",
-    "txt": "#",
-    "md": "<!--",
-}
-#+end_src
-
-#+begin_src python
-def guess_comment_symbol(language: str) -> str:
-    """Return the default comment symbol for a given language."""
-    return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
 #+end_src
 
 #+begin_src python
@@ -68,8 +48,38 @@ def guess_comment_symbol(language: str) -> str:
 #+end_src
 
 #+begin_src python
-# Default infix for unsafe files
-UNSAFE_INFIX = ".unsafe"
+  UNSAFE_INFIX = ".unsafe"
+#+end_src
+
+#+begin_src python
+  DEFAULT_COMMENT_SYMBOLS = {
+      "py": "#",
+      "python": "#",
+      "js": "//",
+      "javascript": "//",
+      "ts": "//",
+      "cpp": "//",
+      "c": "//",
+      "h": "//",
+      "java": "//",
+      "rb": "#",
+      "sh": "#",
+      "bash": "#",
+      "tex": "%",
+      "txt": "#",
+      "md": "<!--",
+  }
+#+end_src
+
+#+begin_src python
+  def guess_comment_symbol(language: str) -> str:
+      """Return the default comment symbol for a given language."""
+      return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
+#+end_src
+
+#+begin_src python
+  # Default infix for unsafe files
+  UNSAFE_INFIX = ".unsafe"
 #+end_src
 
 #+begin_src python
@@ -78,41 +88,41 @@ UNSAFE_INFIX = ".unsafe"
 #+end_src
 
 #+begin_src python
-DEFAULT_COMMENT_SYMBOLS = {
-    "py": "#",
-    "python": "#",
-    "js": "//",
-    "javascript": "//",
-    "ts": "//",
-    "cpp": "//",
-    "c": "//",
-    "h": "//",
-    "java": "//",
-    "rb": "#",
-    "sh": "#",
-    "bash": "#",
-    "tex": "%",
-    "txt": "#",
-    "md": "<!--",
-}
+  DEFAULT_COMMENT_SYMBOLS = {
+      "py": "#",
+      "python": "#",
+      "js": "//",
+      "javascript": "//",
+      "ts": "//",
+      "cpp": "//",
+      "c": "//",
+      "h": "//",
+      "java": "//",
+      "rb": "#",
+      "sh": "#",
+      "bash": "#",
+      "tex": "%",
+      "txt": "#",
+      "md": "<!--",
+  }
 #+end_src
 
 #+begin_src python
-def guess_comment_symbol(language: str) -> str:
-    return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
+  def guess_comment_symbol(language: str) -> str:
+      return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
 #+end_src
 
 #+begin_src python
-def infer_output_path(input_path: str, infix: str) -> str:
-    """
-    Remove the first occurrence of `infix` from the filename.
-    Raise ValueError if `infix` is not found.
-    """
-    base, ext = os.path.splitext(input_path)
-    if infix not in base:
-        raise ValueError(f"Input file '{input_path}' does not contain the required infix '{infix}'")
-    cleaned_base = base.replace(infix, "", 1)
-    return cleaned_base + ext
+  def infer_output_path(input_path: str, infix: str) -> str:
+      """
+      Remove the first occurrence of `infix` from the filename.
+      Raise ValueError if `infix` is not found.
+      """
+      base, ext = os.path.splitext(input_path)
+      if infix not in base:
+          raise ValueError(f"Input file '{input_path}' does not contain the required infix '{infix}'")
+      cleaned_base = base.replace(infix, "", 1)
+      return cleaned_base + ext
 #+end_src
 
 #+begin_src python
@@ -145,7 +155,7 @@ def infer_output_path(input_path: str, infix: str) -> str:
       # Compute search anchors
       if search_begin is None:
           search_begin = CENSOR_BEGIN_ANCHOR_TEMPLATE.format(comment=comment_symbol)
-      
+          
       if search_end is None:
           search_end = CENSOR_END_ANCHOR_TEMPLATE.format(comment=comment_symbol)
 
@@ -177,29 +187,231 @@ def infer_output_path(input_path: str, infix: str) -> str:
 #+end_src
 
 #+begin_src python
-if __name__ == "__main__":
-    import argparse
-    import sys
+  if __name__ == "__main__":
+      import argparse
+      import sys
 
-    parser = argparse.ArgumentParser(description="Sanitize a file by replacing <censor> blocks.")
-    parser.add_argument("input_path", help="Path to the input file")
-    parser.add_argument("-o", "--output_path", help="Output file path (use '-' for stdout)", default=None)
-    parser.add_argument("-l", "--language", help="Language for comment symbol inference", default=None)
-    parser.add_argument("-c", "--comment_symbol", help="Override comment symbol", default=None)
-    parser.add_argument("--search_begin", help="Override <censor> begin anchor", default=None)
-    parser.add_argument("--search_end", help="Override <censor> end anchor", default=None)
-    parser.add_argument("--infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
+      parser = argparse.ArgumentParser(description="Sanitize a file by replacing <censor> blocks.")
+      parser.add_argument("input_path", help="Path to the input file")
+      parser.add_argument("-o", "--output_path", help="Output file path (use '-' for stdout)", default=None)
+      parser.add_argument("-l", "--language", help="Language for comment symbol inference", default=None)
+      parser.add_argument("-c", "--comment_symbol", help="Override comment symbol", default=None)
+      parser.add_argument("--search_begin", help="Override <censor> begin anchor", default=None)
+      parser.add_argument("--search_end", help="Override <censor> end anchor", default=None)
+      parser.add_argument("--infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
 
-    args = parser.parse_args()
+      args = parser.parse_args()
 
-    # call the function
-    process_file(
-        input_path=args.input_path,
-        output_path=args.output_path,
-        language=args.language,
-        comment_symbol=args.comment_symbol,
-        search_begin=args.search_begin,
-        search_end=args.search_end,
-        infix=args.infix
-    )
+      # call the function
+      process_file(
+          input_path=args.input_path,
+          output_path=args.output_path,
+          language=args.language,
+          comment_symbol=args.comment_symbol,
+          search_begin=args.search_begin,
+          search_end=args.search_end,
+          infix=args.infix
+      )
 #+end_src
+
+** ical2json
+:PROPERTIES:
+:header-args: :tangle "../py/ical2json.py"
+:END:
+
+This is a COPY of @philippbosch's [[https://github.com/philippbosch/ical2json/blob/master/LICENSE][script ical2censor]].
+
+#+begin_src python
+  #!/usr/bin/env python
+  # -*- coding: utf-8 -*-
+#+end_src
+
+#+begin_src python
+  #  Copyright (c) 2011, Philipp Bosch
+  #
+  #  Permission is hereby granted, free of charge, to any person obtaining a
+  #  copy of this software and associated documentation files (the Software),
+  #  to deal in the Software without restriction, including
+  #  without limitation the rights to use, copy, modify, merge, publish,
+  #  distribute, sublicense, and/or sell copies of the Software, and to
+  #  permit persons to whom the Software is furnished to do so, subject to
+  #  the following conditions:
+  #
+  #  The above copyright notice and this permission notice shall be included
+  #  in all copies or substantial portions of the Software.
+  #
+  #  THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+  #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  #  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+  #  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+  #  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+  #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+  #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#+end_src
+
+#+begin_src python
+  import os
+
+  from flask import Flask, abort, jsonify, request
+  from icalendar import Calendar
+  import requests
+
+  app = Flask(__name__)
+#+end_src
+
+#+begin_src python
+  @app.route('/')
+  def index():
+      return u'Please use like <code>http://<script>document.write(location.host);</script><noscript>ical2json.pb.io</noscript>/http://www.myserver.com/path/to/file.ics</code><br>Source code and instructions at <a href="http://github.com/philippbosch/ical2json">http://github.com/philippbosch/ical2json</a>.'
+#+end_src
+
+#+begin_src python
+  @app.route('/<path:url>')
+  def convert_from_url(url):
+      if url == 'favicon.ico':
+          abort(404)
+      if not url.startswith('http'):
+          url = 'http://%s' % url
+
+      try:
+          r = requests.get(url)
+      except:
+          abort(500)
+          
+      if not r.ok:
+          abort(r.status_code)
+          ics = r.content
+          cal = Calendar.from_ical(ics)
+          data = {}
+          data[cal.name] = dict(cal.items())
+
+      for component in cal.subcomponents:
+          if not component.name in data[cal.name]:
+              data[cal.name][component.name] = []
+
+          comp_obj = {}
+          for item in component.items():
+              if hasattr(item[1], 'dt'):
+                  val = item[1].dt.isoformat()
+              else:
+                  val = item[1].to_ical().decode('utf-8').replace('\\,', ',')
+                  comp_obj[item[0]] = val
+                  
+          data[cal.name][component.name].append(comp_obj)
+
+      resp = jsonify(data)
+      if 'callback' in request.args:
+          resp.data = "%s(%s);" % (request.args['callback'], resp.data)
+      return resp
+#+end_src
+
+#+begin_src python
+  if __name__ == '__main__':
+      port = int(os.environ.get('PORT', 5000))
+      app.run(host='0.0.0.0', port=port, debug=True)  
+#+end_src
+
+#+begin_src python
+  if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
+#+end_src
+
+** init
+:PROPERTIES:
+:header-args: :tangle "../py/__init__.py.py"
+:END:
+
+#+header: :noweb yes
+#+begin_src python
+  <<py-license>>
+#+end_src
+
+* shell
+** ical2json
+*** setup
+
+~Ctrl-C Ctrl-C~
+#+begin_src sh
+  # One time setup for ical2json
+  pipenv install flask requests icalendar
+#+end_src
+
+#+RESULTS:
+| To             | activate        | this      | project's    | virtualenv, | run | pipenv     | shell. |        |      |
+| Alternatively, | run             | a         | command      | inside      | the | virtualenv | with   | pipenv | run. |
+| Installing     | flask...        |           |              |             |     |            |        |        |      |
+| ✔              | Installation    | Succeeded |              |             |     |            |        |        |      |
+| Installing     | requests...     |           |              |             |     |            |        |        |      |
+| ✔              | Installation    | Succeeded |              |             |     |            |        |        |      |
+| Installing     | icalendar...    |           |              |             |     |            |        |        |      |
+| ✔              | Installation    | Succeeded |              |             |     |            |        |        |      |
+| To             | activate        | this      | project's    | virtualenv, | run | pipenv     | shell. |        |      |
+| Alternatively, | run             | a         | command      | inside      | the | virtualenv | with   | pipenv | run. |
+| Installing     | dependencies    | from      | Pipfile.lock | (da8323)... |     |            |        |        |      |
+| All            | dependencies    | are       | now          | up-to-date! |     |            |        |        |      |
+| Building       | requirements... |           |              |             |     |            |        |        |      |
+| Resolving      | dependencies... |           |              |             |     |            |        |        |      |
+| ✔              | Success!        |           |              |             |     |            |        |        |      |
+| To             | activate        | this      | project's    | virtualenv, | run | pipenv     | shell. |        |      |
+| Alternatively, | run             | a         | command      | inside      | the | virtualenv | with   | pipenv | run. |
+| Installing     | dependencies    | from      | Pipfile.lock | (b85116)... |     |            |        |        |      |
+| All            | dependencies    | are       | now          | up-to-date! |     |            |        |        |      |
+| Installing     | dependencies    | from      | Pipfile.lock | (b85116)... |     |            |        |        |      |
+
+#+begin_src sh
+  chmod +x ./py/ical2json.py
+#+end_src
+
+#+begin_src sh
+  chmod +x ./sh/ical2json.example.sh
+#+end_src
+
+*** example
+:PROPERTIES:
+:header-args: :tangle "../sh/ical2json.example.sh"
+:END:
+
+#+header: :noweb yes
+#+begin_src shell
+  <<py-license>>
+#+end_src
+
+#+begin_src shell
+  # Troubleshooting:
+  # - Address already in use Port 5000 is in use by another program
+  # `fuser -k 5000/tcp || true`
+#+end_src
+
+#+begin_src sh
+  set -e
+#+end_src
+
+#+begin_src sh
+  cd "$(dirname "$0")/.."
+#+end_src
+
+#+begin_src shell
+  # This is a dummy calendar
+  url_ics='https://calendar.google.com/calendar/ical/abe44317faa2cfe48c0ca99b5ede79bca5e401facae66c109e2cc870e0ad8338%40group.calendar.google.com/public/basic.ics'
+#+end_src
+
+#+begin_src shell
+  # PORT `flask` listens to:
+  export PORT=5000
+  url_local="http://0.0.0.0:$PORT"
+#+end_src
+
+#+begin_src shell
+  url_proxy="${url_local%/}/${url_ics}"
+#+end_src
+
+#+begin_src shell
+  # This should download an *.ics file
+  pipenv run python py/ical2json.py --port $PORT &
+  sleep 1
+  xdg-open "$url_proxy"
+  wait
+#+end_src
+
+

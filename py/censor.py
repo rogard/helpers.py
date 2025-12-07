@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # -----------------------------------------------------------------
 # Copyright (C) 2025 Erwann Rogard
 # Source repository: https://github.com/rogard/helpers.py
@@ -34,10 +36,6 @@ DEFAULT_COMMENT_SYMBOLS = {
 def guess_comment_symbol(language: str) -> str:
     """Return the default comment symbol for a given language."""
     return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
-
-import os
-import re
-import sys
 
 # Default infix for unsafe files
 UNSAFE_INFIX = ".unsafe"
@@ -106,7 +104,7 @@ def process_file(*, input_path, output_path=None, language=None,
     # Compute search anchors
     if search_begin is None:
         search_begin = CENSOR_BEGIN_ANCHOR_TEMPLATE.format(comment=comment_symbol)
-    
+        
     if search_end is None:
         search_end = CENSOR_END_ANCHOR_TEMPLATE.format(comment=comment_symbol)
 
