@@ -354,7 +354,7 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 
 ** ics2json
 :PROPERTIES:
-:header-args: :tangle "../py/icsjson.py"
+:header-args: :tangle "../py/ics2json.py"
 :END:
 
 #+header: :noweb yes
@@ -389,108 +389,40 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 #+end_src
 
 #+begin_src python
-    def ics_to_dict(ics_content):
-        """
-        Convert ICS content to dictionary.
-        
-        Args:
-            ics_content: Bytes or string containing ICS data
-            
-        Returns:
-            Dictionary with calendar data
-        """
-        if isinstance(ics_content, str):
-            ics_content = ics_content.encode('utf-8')
-            
-        cal = Calendar.from_ical(ics_content)
-        
-        # Build data structure
-        data = {}
-        data[cal.name] = dict(cal.items())
-        
-        for component in cal.subcomponents:
-            if component.name not in data[cal.name]:
-                data[cal.name][component.name] = []
-                
-            comp_obj = {}
-            for key,value in component.items():
-                if hasattr(value, 'dt'):
-                    val = value.dt.isoformat()
-                else:
-                    val = value.to_ical().decode('utf-8').replace('\\,', ',')
-                comp_obj[key] = val
-
-#                 if hasattr(item[1], 'dt'):
-#                     val = item[1].dt.isoformat()
-#                 else:
-#                     val = item[1].to_ical().decode('utf-8').replace('\\,', ',')
-#                     comp_obj[item[0]] = val
-                    
-            data[cal.name][component.name].append(comp_obj)
-            
-        return data
-#+end_src
-
-#+begin_src python
-  # Marked for removal
-  #   def fetch_from_url(url,timeout):
-  #       """
-  #       Fetch ICS content from URL by saving to temp file and recursing.
-  #       
-  #       Args:
-  #           url: URL to fetch ICS file from
-  #           
-  #       Returns:
-  #           ICS content as bytes (via recursion to read_from_file)
-  #       """
-  #       import tempfile
-  #       import atexit
-  #       
-  #       try:
-  #           response = requests.get(url, timeout=timeout)
-  #           response.raise_for_status()
-  # 
-  #           with tempfile.NamedTemporaryFile(
-  #                   suffix=DEFAULT_TEMP_SUFFIX,
-  #                   prefix=DEFAULT_TEMP_PREFIX,
-  #                   delete=True) as tmp:
-  #               tmp.write(response.content)
-  #               temp_path = tmp.name
-  # 
-  #           print(f"Saved to temp file: {temp_path}", file=sys.stderr)
-  #           
-  #           # Recurse to read_from_file
-  #           return read_from_file(temp_path)
-  #       
-  #       except requests.HTTPError as e:
-  #           print(f"Error: HTTP {e.response.status_code} when fetching URL", file=sys.stderr)
-  #           sys.exit(1)
-  #       except requests.RequestException as e:
-  #           print(f"Error: Failed to fetch URL: {e}", file=sys.stderr)
-  #           sys.exit(1)
-#+end_src
-
-#+begin_src python
-  # TODO Remove
-  # def read_from_file(filepath):
-  #     """
-  #     Read ICS content from local file.
-  #     
-  #     Args:
-  #         filepath: Path to ICS file
-  #         
-  #     Returns:
-  #         ICS content as bytes
-  #     """
-  #     try:
-  #         path = Path(filepath)
-  #         if not path.exists():
-  #             print(f"Error: File not found: {filepath}", file=sys.stderr)
-  #             sys.exit(1)
-  #         return path.read_bytes()
-  #     except Exception as e:
-  #         print(f"Error: Failed to read file: {e}", file=sys.stderr)
-  #         sys.exit(1)
+  def ics_to_dict(ics_content):
+      """
+      Convert ICS content to dictionary.
+      
+      Args:
+          ics_content: Bytes or string containing ICS data
+          
+      Returns:
+          Dictionary with calendar data
+      """
+      if isinstance(ics_content, str):
+          ics_content = ics_content.encode('utf-8')
+          
+      cal = Calendar.from_ical(ics_content)
+      
+      # Build data structure
+      data = {}
+      data[cal.name] = dict(cal.items())
+      
+      for component in cal.subcomponents:
+          if component.name not in data[cal.name]:
+              data[cal.name][component.name] = []
+              
+          comp_obj = {}
+          for key,value in component.items():
+              if hasattr(value, 'dt'):
+                  val = value.dt.isoformat()
+              else:
+                  val = value.to_ical().decode('utf-8').replace('\\,', ',')
+                  comp_obj[key] = val
+                  
+          data[cal.name][component.name].append(comp_obj)
+          
+      return data
 #+end_src
 
 #+begin_src python
@@ -587,7 +519,7 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
       else:
           print(f"Reading from file: {args.file}", file=sys.stderr)
           ics_content = read_ics(args.file)
-              
+          
       # Convert to dictionary
       try:
           data = ics_to_dict(ics_content)
@@ -620,7 +552,6 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
   if __name__ == '__main__':
       sys.exit(main())
 #+end_src
-
 ** init
 :PROPERTIES:
 :header-args: :tangle "../py/__init__.py"
@@ -632,6 +563,13 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 #+end_src
 
 * shell
+** header
+
+#+name: shell-shebang
+#+begin_src python
+  #!/usr/bin/env bash
+#+end_src
+
 ** ical2json
 *** setup
 
@@ -656,6 +594,11 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 
 #+header: :noweb yes
 #+begin_src shell
+  <<shell-shebang>>
+#+end_src
+
+#+header: :noweb yes
+#+begin_src shell
   <<py-license>>
 #+end_src
 
@@ -677,13 +620,13 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 
 #+header: :noweb-ref shell-cal-example-common
 #+begin_src shell
-  ics_url=$(jq -r '.dummy_ics_url' ../json/config.json)
+  ics_url=$(jq -r '.dummy_ics_url' ./json/config.json)
   # echo "$ics_url"
 #+end_src
 
 #+header: :noweb-ref shell-cal-example-common
 #+begin_src shell
-  cal_json='../json/calendar.json'
+  cal_json='json/calendar.json'
 #+end_src
 
 #+begin_src shell
@@ -727,16 +670,31 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 
 #+header: :noweb yes
 #+begin_src shell
-  <<py-license>>
+  <<shell-shebang>>
 #+end_src
 
 #+header: :noweb yes
-#+begin_src sh
-  <<shell-cal-example-common>>
+#+begin_src shell
+  <<py-license>>
 #+end_src
 
 #+begin_src shell
-  python ics2json.py --url "$ics_url" --output ../json/calendar.json
+  # Root of the project
+  SCRIPT_DIR="$(realpath "$(dirname "$0")")"
+  PROJECT_ROOT="$(realpath "$SCRIPT_DIR/..")"
+#+end_src
+
+#+begin_src shell
+  printf 'DEBUG:\n- script_dir=%s\n- project_root=%s\n' "$SCRIPT_DIR" "$PROJECT_ROOT"
+#+end_src
+
+#+begin_src shell
+  ics_url=$(jq -r '.dummy_ics_url' "$PROJECT_ROOT/json/config.json")
+  cal_json="$PROJECT_ROOT/json/calendar.json"
+#+end_src
+
+#+begin_src shell
+  pipenv run python "$PROJECT_ROOT/py/ics2json.py" --url "$ics_url" --output "$cal_json"
 #+end_src
 
 * json

@@ -64,9 +64,9 @@ DEFAULT_COMMENT_SYMBOLS = {
 def guess_comment_symbol(language: str) -> str:
     return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
 
-def infer_output_path(input_path: str, infix: str) -> str:
+def infer_output_path(input_path: str, strip_infix: str) -> str:
     """
-    Remove the first occurrence of `infix` from the filename.
+    Strip the first occurrence of `infix` from the filename.
     Raise ValueError if `infix` is not found.
     """
     base, ext = os.path.splitext(input_path)
