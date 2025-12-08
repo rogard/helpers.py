@@ -3,6 +3,7 @@
 
 # Original code (Bosch) as recorded at:
 # https://github.com/rogard/helpers.py, commit 9d1a659
+# Exception handling modified thereafter
 
 #  Copyright (c) 2011, Philipp Bosch
 #
@@ -24,6 +25,15 @@
 #  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# -----------------------------------------------------------------
+# Copyright (C) 2025 Erwann Rogard
+# Source repository: https://github.com/rogard/helpers.py
+#
+# Python code:
+# Released under the GNU General Public License v3.0 or later
+# See https://www.gnu.org/licenses/gpl-3.0.html
+# -----------------------------------------------------------------
 
 import os
 
