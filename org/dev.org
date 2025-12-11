@@ -123,7 +123,7 @@
 #+end_src
 
 #+begin_src python
-  def infer_output_path(input_path: str, strip_infix: str) -> str:
+  def infer_output_path(input_path: str, infix: str) -> str:
       """
       Strip the first occurrence of `infix` from the filename.
       Raise ValueError if `infix` is not found.
@@ -208,7 +208,7 @@
       parser.add_argument("-c", "--comment_symbol", help="Override comment symbol", default=None)
       parser.add_argument("--search_begin", help="Override <censor> begin anchor", default=None)
       parser.add_argument("--search_end", help="Override <censor> end anchor", default=None)
-      parser.add_argument("--infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
+      parser.add_argument("--strip-infix", dest="infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
 
       args = parser.parse_args()
 
@@ -378,6 +378,8 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
   from pathlib import Path
   from icalendar import Calendar
   import requests
+  import shlex
+  import os
 #+end_src
 
 #+begin_src python
@@ -439,65 +441,66 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 
 #+begin_src python
   def parse_args():
-      """Parse command line arguments."""
+      """
+      Parse CLI arguments, with optional --args-as-json.
+      If --args-as-json is given, recursively re-invoke the script
+      with JSON arguments converted to native options.
+      """
+      # First, parse only --args-as-json
+      parser = argparse.ArgumentParser(add_help=False)
+      parser.add_argument('--args-as-json', help='JSON string or file containing arguments')
+      known_args, remaining_argv = parser.parse_known_args()
+
+      if known_args.args_as_json:
+          # Load JSON
+          path = Path(known_args.args_as_json)
+          if path.exists():
+              with path.open('r', encoding='utf-8') as f:
+                  json_args = json.load(f)
+          else:
+              try:
+                  json_args = json.loads(known_args.args_as_json)
+              except json.JSONDecodeError as e:
+                  print(f"Error parsing --args-as-json: {e}", file=sys.stderr)
+                  sys.exit(1)
+
+          # Convert JSON to CLI arguments
+          cli_args = []
+          for key, value in json_args.items():
+              key_opt = f"--{key.replace('_','-')}"
+              if isinstance(value, bool):
+                  if value:
+                      cli_args.append(key_opt)
+                      # skip False booleans
+              else:
+                  cli_args.append(key_opt)
+                  cli_args.append(str(value))
+
+          # Recursively call the script with new arguments
+          new_argv = [sys.argv[0]] + cli_args + remaining_argv
+          os.execv(sys.executable, [sys.executable] + new_argv)
+
+      # Normal argparse for the actual script
       parser = argparse.ArgumentParser(
           description='Convert ICS calendar files to JSON format',
           formatter_class=argparse.RawDescriptionHelpFormatter,
           epilog="""
   Examples:
-    # Fetch from URL and save to file
     %(prog)s --url https://example.com/calendar.ics --output calendar.json
-    
-    # Fetch from URL and print to stdout
-    %(prog)s --url https://example.com/calendar.ics
-    
-    # Convert local file
     %(prog)s --file calendar.ics --output calendar.json
-    
-    # Convert local file and print to stdout
-    %(prog)s --file calendar.ics
-    
-    # Customize timeout and formatting
     %(prog)s --url https://example.com/calendar.ics --timeout 60 --json-indent 4
-          """
+  """
       )
-      
-      # Input source (mutually exclusive)
+
       source = parser.add_mutually_exclusive_group(required=True)
-      source.add_argument(
-          '--url',
-          help='Fetch ICS file from URL'
-      )
-      source.add_argument(
-          '--file',
-          help='Read ICS file from local path'
-      )
-      
-      # Output options
-      parser.add_argument(
-          '--output', '-o',
-          help='Output JSON file path (default: print to stdout)'
-      )
-      parser.add_argument(
-          '--pretty',
-          action='store_true',
-          help='Pretty-print JSON with indentation'
-      )
-      
-      # Advanced options
-      parser.add_argument(
-          '--timeout',
-          type=int,
-          default=DEFAULT_TIMEOUT,
-          help=f'Request timeout in seconds (default: {DEFAULT_TIMEOUT})'
-      )
-      parser.add_argument(
-          '--json-indent',
-          type=int,
-          default=DEFAULT_JSON_INDENT,
-          help=f'JSON indentation spaces when using --pretty (default: {DEFAULT_JSON_INDENT})'
-      )
-      
+      source.add_argument('--url', help='Fetch ICS file from URL')
+      source.add_argument('--file', help='Read ICS file from local path')
+
+      parser.add_argument('--output', '-o', help='Output JSON file path (default: stdout)')
+      parser.add_argument('--pretty', action='store_true', help='Pretty-print JSON with indentation')
+      parser.add_argument('--timeout', type=int, default=30, help='Request timeout in seconds')
+      parser.add_argument('--json-indent', type=int, default=2, help='JSON indentation spaces when using --pretty')
+
       return parser.parse_args()
 #+end_src
 
@@ -700,7 +703,7 @@ This is a modified COPY of @philippbosch's [[https://github.com/philippbosch/ica
 * json
 ** config
 :PROPERTIES:
-:header-args: :tangle "../json/config.json"
+:header-args: :tangle "../json/config.example.json"
 :END:
 
 #+begin_src json

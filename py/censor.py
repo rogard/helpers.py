@@ -64,7 +64,7 @@ DEFAULT_COMMENT_SYMBOLS = {
 def guess_comment_symbol(language: str) -> str:
     return DEFAULT_COMMENT_SYMBOLS.get(language.lower(), "#")
 
-def infer_output_path(input_path: str, strip_infix: str) -> str:
+def infer_output_path(input_path: str, infix: str) -> str:
     """
     Strip the first occurrence of `infix` from the filename.
     Raise ValueError if `infix` is not found.
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--comment_symbol", help="Override comment symbol", default=None)
     parser.add_argument("--search_begin", help="Override <censor> begin anchor", default=None)
     parser.add_argument("--search_end", help="Override <censor> end anchor", default=None)
-    parser.add_argument("--infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
+    parser.add_argument("--strip-infix", dest="infix", help="Infix marking unsafe file", default=UNSAFE_INFIX)
 
     args = parser.parse_args()
 
